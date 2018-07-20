@@ -1,5 +1,5 @@
 [package]
-name = "my-tui-app"
+name = "bitmap-show-cli"
 version = "0.1.0"
 authors = ["jk"]
 
