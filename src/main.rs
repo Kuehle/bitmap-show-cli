@@ -3,6 +3,7 @@ extern crate bmp;
 
 use termion::{color, cursor, clear};
 use std::thread;
+use std::env;
 use bmp::{Image, Pixel};
 
 
@@ -15,6 +16,13 @@ fn goto(x: u32, y: u32) {
     print!("{}", goto = cursor::Goto(x as u16, y as u16));
 }
 
+fn set_color_bw() {
+    print!("{}{}", color::Fg(color::White), color::Bg(color::Black));
+}
+
+fn reset_color() {
+    print!("{}{}", color::Fg(color::Reset), color::Bg(color::Reset));
+}
 // todo black bg / white fg
 // add colors
 // add more unicode characters 
@@ -31,7 +39,10 @@ fn main() {
     println!("terminal-ter_width: {}\nterminal-ter_height: {}", ter_width, ter_height);
 
     // --------------
-    let img = bmp::open("./in-img.bmp").unwrap_or_else(|e| {
+    let args: Vec<String> = env::args().collect();
+    println!("Arguments {:?}", args);
+    let img = bmp::open(&args[1]).unwrap_or_else(|e| {
+    // let img = bmp::open(env::args().collect().1).unwrap_or_else(|e| {
         panic!("Failed to open: {}", e);
     });
 
@@ -59,6 +70,7 @@ fn render(area: & Vec<Vec<u32>>) {
     let x_offset = 1;
     let y_offset = 1;
     clear();
+    set_color_bw();
     goto(x_offset, y_offset);
     for (i, outer) in area.iter().enumerate() {
         for (j, inner) in outer.iter().enumerate() {
@@ -66,6 +78,7 @@ fn render(area: & Vec<Vec<u32>>) {
         }
         goto(x_offset, 1 + y_offset + i as u32)
     }
+    reset_color();
     // println!("");
 }
 
