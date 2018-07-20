@@ -16,6 +16,9 @@ fn goto(x: u32, y: u32) {
 }
 
 // todo black bg / white fg
+// add colors
+// add more unicode characters 
+// add more file supports 
 
 fn main() {
     let (ter_width, ter_height) = match termion::terminal_size() {
