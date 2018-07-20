@@ -23,7 +23,8 @@ fn set_color_bw() {
 fn reset_color() {
     print!("{}{}", color::Fg(color::Reset), color::Bg(color::Reset));
 }
-// todo black bg / white fg
+
+// handle path cli argument
 // add colors
 // add more unicode characters 
 // add more file supports 
@@ -36,13 +37,10 @@ fn main() {
             (50, 12)
         }
     };
-    println!("terminal-ter_width: {}\nterminal-ter_height: {}", ter_width, ter_height);
 
-    // --------------
     let args: Vec<String> = env::args().collect();
-    println!("Arguments {:?}", args);
+    
     let img = bmp::open(&args[1]).unwrap_or_else(|e| {
-    // let img = bmp::open(env::args().collect().1).unwrap_or_else(|e| {
         panic!("Failed to open: {}", e);
     });
 
@@ -53,8 +51,6 @@ fn main() {
 
     let render_width = ( img.get_width() as f32 / mult ) as u32;
     let render_height = ( img.get_height() as f32 / mult ) as u32;
-
-    println!("render width {} render height {}", render_width, render_height);
 
     let mut area: Vec<Vec<u32>> = vec![vec![1; render_width as usize]; render_height as usize];
 
