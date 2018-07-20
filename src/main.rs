@@ -15,36 +15,38 @@ fn goto(x: u32, y: u32) {
     print!("{}", goto = cursor::Goto(x as u16, y as u16));
 }
 
-// todo print on full width
-
+// todo black bg / white fg
 
 fn main() {
-    let (width, height) = match termion::terminal_size() {
-        Ok((width, height)) => (width / 2, height),
+    let (ter_width, ter_height) = match termion::terminal_size() {
+        Ok((ter_width, ter_height)) => (ter_width / 2, ter_height),
         Err(e) => {
             println!("Can not get terminal size - assuming min of 50x12");
             (50, 12)
         }
     };
-    
-    println!("width: {}\nheight: {}", width, height);
+    println!("terminal-ter_width: {}\nterminal-ter_height: {}", ter_width, ter_height);
 
     // --------------
-    let img = bmp::open("./in-img300.bmp").unwrap_or_else(|e| {
+    let img = bmp::open("./in-img.bmp").unwrap_or_else(|e| {
         panic!("Failed to open: {}", e);
     });
 
-    let x_mult = img.get_width() / width as u32;
-    let y_mult = img.get_height() / height as u32;
+    let x_mult = img.get_width() as f32 / ter_width as f32;
+    let y_mult = img.get_height() as f32 / ter_height as f32;
 
-    let mut area: Vec<Vec<u32>> = vec![vec![1; width as usize]; height as usize];
+    let mult = if x_mult >= y_mult { x_mult } else { y_mult };
 
-    // thread::sleep_ms(400);
-    for i in 0..width {
-        for j in 0..height {
-            println!("{:?}", (i, j));
-            println!("{:?}", (i as u32 * x_mult, j as u32 * y_mult));
-            area[j as usize][i as usize] = numberFromPixel(&img.get_pixel(i as u32 * x_mult, j as u32 * y_mult));
+    let render_width = ( img.get_width() as f32 / mult ) as u32;
+    let render_height = ( img.get_height() as f32 / mult ) as u32;
+
+    println!("render width {} render height {}", render_width, render_height);
+
+    let mut area: Vec<Vec<u32>> = vec![vec![1; render_width as usize]; render_height as usize];
+
+    for i in 0..render_width {
+        for j in 0..render_height {
+            area[j as usize][i as usize] = numberFromPixel(&img.get_pixel((i as f32 * mult) as u32, (j as f32 * mult) as u32));
         }
     }
     render(& mut area);
@@ -61,7 +63,7 @@ fn render(area: & Vec<Vec<u32>>) {
         }
         goto(x_offset, 1 + y_offset + i as u32)
     }
-    println!("");
+    // println!("");
 }
 
 fn get_graphic(num: &u32) -> String {
